@@ -70,7 +70,7 @@ void setup(){
   pinMode(6,OUTPUT);
   digitalWrite(5,HIGH);
   digitalWrite(6,LOW);
-  
+
   strip.begin();
   delay(100);
   strip.show();
@@ -99,23 +99,23 @@ void setup(){
 
 
 //--------------------------------------------------- loop
-void loop() 
+void loop()
 {
   while(Serial.available())
   { //Para checar el puerto serial
    {
      tecla = Serial.read(); //Lee el primer caracter de la cadena
      //while(Serial.available() == 0); //espera a la siguiente
-     
+
      valSerial = Serial.readStringUntil(',');// read the serial value
      valColor = Serial.readStringUntil(')');
-     
+
      color = valColor.toInt();
      numero = valSerial.toInt();
-     
+
      if(numero >= 10000)
       numero = 0;
-      
+
      switch(tecla)
       {
         case '|':
@@ -124,21 +124,21 @@ void loop()
         strip = strip1;
         displayNum(numero,color);
         break;
-        
+
         case '/':
         Serial.print("2: ");
         Serial.print(numero);
         strip = strip2;
         displayNum(numero,color);
         break;
-        
+
         case '*':
         Serial.print("3: ");
         Serial.print(numero);
         strip = strip3;
         displayNum(numero,color);
         break;
-        
+
         case '!':
         Serial.print("4: ");
         Serial.print(numero);
@@ -149,25 +149,25 @@ void loop()
     }
    }
  }
-  
-  
-//  if (irrecv.decode(&results)) 
-//  { //Para revisar Infrarrojo
-//    IRselect();
-//    irrecv.resume(); // Receive the next value
-//  }
-  
-  
+
+
+  if (irrecv.decode(&results))
+  { //Para revisar Infrarrojo
+    IRselect();
+    irrecv.resume(); // Receive the next value
+  }
+
+
 }
 
 
 //--------------------------------------------------- displayNum
-void displayNum(uint16_t h, uint32_t col) 
-{ 
+void displayNum(uint16_t h, uint32_t col)
+{
  apagaPixels();
 
 
- 
+
   uint16_t firstDigit = h / 1000;
   uint16_t secondDigit = (h % 1000)/100;
   uint16_t thirdDigit = ((h%1000)%100)/ 10;
@@ -177,9 +177,9 @@ void displayNum(uint16_t h, uint32_t col)
 
   //Serial.print("\t");
   //---------------------------------------- firstDigit
-  for ( i = 0; i < 7; i++) 
+  for ( i = 0; i < 7; i++)
   {
-    if ((numbers[firstDigit] & (1 << 7 - i)) && (firstDigit > 0)) // Que sea diferente de cero 
+    if ((numbers[firstDigit] & (1 << 7 - i)) && (firstDigit > 0)) // Que sea diferente de cero
     { //Revisa el byte específico del vector y decide si debe encenderlo de algún color o apagarlo
       strip.setPixelColor(j + (14 * 3), Wheel(col)); //Le asigna el color o...
       //delay(10);
@@ -187,20 +187,20 @@ void displayNum(uint16_t h, uint32_t col)
       //delay(10);
       //Serial.print("1");
     }
-    else 
+    else
     {
       strip.setPixelColor(j + (14 * 3 ), 0,0,0,0); //...lo apaga
       //delay(10);
       strip.setPixelColor(j+1 + (14 * 3 + 2), 0,0,0,0);
       //delay(10);
       //Serial.print("0");
-    } 
+    }
     j=j+2; //Posicion del Neopixel
   }
   // ---------------------------------------- secondDigit
   j=0;
   //Serial.print("\t");
-  for (i = 0; i < 7; i++) 
+  for (i = 0; i < 7; i++)
   {
     if ((numbers[secondDigit] & (1 << 7 - i)) && ((secondDigit >= 1) || (firstDigit > 0))) //el cero no se muestra
     {
@@ -210,9 +210,9 @@ void displayNum(uint16_t h, uint32_t col)
       //delay(10);
       //Serial.print("1");
     }
-    else 
+    else
     {
-      strip.setPixelColor(j + (14*2), 0,0,0,0); 
+      strip.setPixelColor(j + (14*2), 0,0,0,0);
       //delay(10);
       strip.setPixelColor(j+1 + (14*2), 0,0,0,0);
       //delay(10);
@@ -223,7 +223,7 @@ void displayNum(uint16_t h, uint32_t col)
    //-------------------------------------------- thirdDigit
    j=0;
    //Serial.print("\t");
-  for (i = 0; i < 7; i++) 
+  for (i = 0; i < 7; i++)
   {
     if ((numbers[thirdDigit] & (1 << 7 - i)) && ((thirdDigit >= 1) || (secondDigit > 0) || (firstDigit > 0))) //el cero no se muestra
     {
@@ -233,9 +233,9 @@ void displayNum(uint16_t h, uint32_t col)
       //delay(10);
       //Serial.print("1");
     }
-    else 
+    else
     {
-      strip.setPixelColor(j + 14, 0,0,0,0); 
+      strip.setPixelColor(j + 14, 0,0,0,0);
       //delay(10);
       strip.setPixelColor(j+1 + 14, 0,0,0,0);
       //delay(10);
@@ -246,9 +246,9 @@ void displayNum(uint16_t h, uint32_t col)
    // -------------------------------------------- fourthDigit
    j=0;
   //Serial.print("\t");
-  for (i = 0; i < 7; i++) 
+  for (i = 0; i < 7; i++)
   {
-    if (numbers[fourthDigit] & (1 << 7 - i)) 
+    if (numbers[fourthDigit] & (1 << 7 - i))
     {
       strip.setPixelColor(j ,Wheel(col));
       //delay(10);
@@ -256,9 +256,9 @@ void displayNum(uint16_t h, uint32_t col)
       //delay(10);
       //Serial.print("1");
     }
-    else 
+    else
     {
-      strip.setPixelColor(j , 0,0,0,0); 
+      strip.setPixelColor(j , 0,0,0,0);
       //delay(10);
       strip.setPixelColor(j+1 , 0,0,0,0);
       //delay(10);
@@ -282,19 +282,19 @@ void apagaPixels()
 }
 
 //---------------------------------- Input a value 0 to 255 to get a color value r - g - b - back to r.
-uint32_t Wheel(byte WheelPos) 
+uint32_t Wheel(byte WheelPos)
 {
   WheelPos = 255 - WheelPos;
-  if (WheelPos < 85) 
+  if (WheelPos < 85)
   {
     return strip.Color(255 - WheelPos * 3, 0, WheelPos * 3,0);
-  } 
-  else if (WheelPos < 170) 
+  }
+  else if (WheelPos < 170)
   {
     WheelPos -= 85;
     return strip.Color(0, WheelPos * 3, 255 - WheelPos * 3,0);
-  } 
-  else 
+  }
+  else
   {
     WheelPos -= 170;
     return strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0,0);
@@ -304,76 +304,76 @@ uint32_t Wheel(byte WheelPos)
 //----------------------------------------------------------------- IRselect
 void IRselect()
 {
-    tecla = results.value;   
+    tecla = results.value;
     switch(tecla)
     {
         case /**/ 0x20DF10EF: // ON
           Serial.println("on");
-          
-          break;
-          
-        case /**/ 0x20DFC23D: // MENU 
-          Serial.println("menu"); 
+
           break;
 
-        case /**/ 0x20DF906F: // MUTE 
-          Serial.println("mute"); 
+        case /**/ 0x20DFC23D: // MENU
+          Serial.println("menu");
+          break;
+
+        case /**/ 0x20DF906F: // MUTE
+          Serial.println("mute");
           break;
         case /*0xFF629D*/ 0x20DF40BF: // +
-          Serial.println("+"); 
+          Serial.println("+");
           break;
-          
-        case /*0xFFA857*/ 0x20DFC03F: // - 
-          Serial.println("-"); 
-          break; 
+
+        case /*0xFFA857*/ 0x20DFC03F: // -
+          Serial.println("-");
+          break;
 
         case /*0xFF42BD*/ 0x20DF56A9: // *
-          Serial.println("*"); 
+          Serial.println("*");
           break;
 
         case /*0xFF02FD*/ 0x20DF22DD:  //ok
-          Serial.println("ok"); 
+          Serial.println("ok");
           break;
 
         case /*0xFF6897*/ 0x20DF8877:  //1
-          Serial.println("l"); 
+          Serial.println("l");
           break;
 
         case /*0xFF9867*/ 0x20DF48B7:   //2
-          Serial.println("2"); 
+          Serial.println("2");
           break;
 
         case /*0xFFB04F*/ 0x20DFC837:  //3
-          Serial.println("3"); 
+          Serial.println("3");
           break;
 
         case /*0xFF30CF*/ 0x20DF28D7:  //4
-           Serial.println("4"); 
+           Serial.println("4");
           break;
 
         case /*0xFF18E7*/ 0x20DFA857:  //5
-          Serial.println("5"); 
+          Serial.println("5");
           break;
 
         case /*0xFF7A85*/ 0x20DF6897:  //6
-          Serial.println("6"); 
+          Serial.println("6");
           break;
 
         case /*0xFF10EF*/ 0x20DFE817:  //7
-          Serial.println("7"); 
+          Serial.println("7");
           break;
 
         case /*0xFF38C7*/ 0x20DF18E7:  //8
-          Serial.println("8"); 
+          Serial.println("8");
           break;
 
         case /*0xFF5AA5*/ 0x20DF9867:  //9
-          Serial.println("9"); 
+          Serial.println("9");
           break;
 
         case /*0xFF4AB5*/ 0x20DF08F7:  //0
-          Serial.println("0"); 
+          Serial.println("0");
           break;
     }
-  
+
 }
