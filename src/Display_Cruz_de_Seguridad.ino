@@ -87,9 +87,9 @@ void loop()
        valColor = Serial.readStringUntil(',');
        nfecha = valFecha.toInt();
        color = valColor.toInt();
-       if(serialCont==1) {displayNumAnio(nfecha,color); Serial.print("Fecha: "); Serial.println(nfecha);}//Sólo guardamos el número y color
+       if(serialCont==1) {displayNumAnio(nfecha,color); Serial.print("Anio: "); Serial.println(nfecha);}//Sólo guardamos el número y color
        else if(serialCont==2) {displayNumMes(nfecha,color); Serial.print("Mes: "); Serial.println(nfecha);}//Sólo guardamos el número y color
-       else if(serialCont==3) displayNumDiasSinAcc(nfecha,color); Serial.print("Dias sin Accidentes: ");Serial.println(nfecha);//Sólo guardamos el número y color
+       else if(serialCont==3) {displayNumDiasSinAcc(nfecha,color); Serial.print("Dias sin Accidentes: ");Serial.println(nfecha);}//Sólo guardamos el número y color
      }
      else if(serialCont==4) {valDiaActual = Serial.readStringUntil(','); ndiaact = valDiaActual.toInt();} //De aquí sólo guardamos el día actual
      else if(serialCont>4 && serialCont<=35)//Todos los casos entre 4 y 35 (31 días)
