@@ -9,16 +9,30 @@
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_PIXELS, PIN, NEO_GRBW + NEO_KHZ800);
 
 int tecla;
+int serialCont=0;
+int fechaAccidente;
 
+/*
  // Variables del puerto serial
-String valDia= "0001";
-String valFecha= "0001";
-String valMesAnio= "0001";
-int nfecha,ndia,nmesanio;
+String valDiasSinAcc= "0001";
+String valMes= "0001";
+String valAnio= "0001";
+int ndiaacc, nmes, nanio, ndiaact;
 
+String valColorAnio= "0127";
+String valColorMes= "0127";
+String valColorDiaSinAcc= "0127";
+String valColorAccidente= "0127";
+int coloranio, colormes, colordiaacc;
+*/
+
+String valFecha= "0001";
 String valColor= "0127";
-String valColorDef= "0127";
-int color, fcolor;
+String valDiaActual= "0001";
+int nfecha, color, ndiaact;
+
+
+
 
 byte numbers[] = {
   B11101110,    // 0
@@ -48,7 +62,6 @@ byte letters[] = {
 int segmDia[]{2,5,5,4,5,6,3,7,6,8,4,7,7,6,7,8,5,9,8,11,7,10,10,9,10,11,8,12,11,11,7};
 //Suma total de segmentos iluminados hasta el día actual
 int segmDiaTotal[]{2,7,12,16,21,27,30,37,43,51,55,62,69,75,82,90,95,104,112,123,130,140,150,159,169,180,188,200,211,222,229};
-int colorFecha[31];
 
 //----------------------------------------------------- configuraciones
 void setup(){
@@ -66,36 +79,37 @@ void loop()
 {
   if (Serial.available()>0)
   { //Para checar el puerto serial
-     tecla = Serial.read();
-     valFecha = Serial.readStringUntil(',');// read the serial value
-     valDia = Serial.readStringUntil(',');
-     valMesAnio = Serial.readStringUntil(',');
-
-     valColor = Serial.readStringUntil(',');
-     valColorDef = Serial.readStringUntil(')'); //El color de todo lo demás menos los días del mes
-
-     nfecha = valFecha.toInt();
-     ndia = valDia.toInt();
-     nmesanio = valMesAnio.toInt();
-     fcolor = valColor.toInt();
-     color = valColorDef.toInt();
-
-     Serial.print("Fecha: ");
-     Serial.println(nfecha);
-     Serial.print("Dia: ");
-     Serial.println(ndia);
-     Serial.print("MesAnio: ");
-     Serial.println(nmesanio);
-
-    displayNumFecha(nfecha,fcolor);
-    displayNumDia(ndia,color);
-    displayNumMesAnio(nmesanio,color);
+     serialCont++;
+     Serial.print("serialCont: "); Serial.println(serialCont);
+     if(serialCont<4)
+     {
+       valFecha = Serial.readStringUntil(',');// read the serial value
+       valColor = Serial.readStringUntil(',');
+       nfecha = valFecha.toInt();
+       color = valColor.toInt();
+       if(serialCont==1) {displayNumAnio(nfecha,color); Serial.print("Fecha: "); Serial.println(nfecha);}//Sólo guardamos el número y color
+       else if(serialCont==2) {displayNumMes(nfecha,color); Serial.print("Mes: "); Serial.println(nfecha);}//Sólo guardamos el número y color
+       else if(serialCont==3) displayNumDiasSinAcc(nfecha,color); Serial.print("Dias sin Accidentes: ");Serial.println(nfecha);//Sólo guardamos el número y color
+     }
+     else if(serialCont==4) {valDiaActual = Serial.readStringUntil(','); ndiaact = valDiaActual.toInt();} //De aquí sólo guardamos el día actual
+     else if(serialCont>4 && serialCont<=35)//Todos los casos entre 4 y 35 (31 días)
+     {
+       valColor = Serial.readStringUntil(',');
+       color = valColor.toInt();
+       fechaAccidente = serialCont - 4; //Para referirnos a cada día
+       displayAccidente(fechaAccidente,color);
+     }
+     if(serialCont>=35) //Los 31 días más los 4 casos previos
+      {
+       serialCont=0;//Reseteamos el contador
+       strip.show();//Ahora sí mostramos todo al mismo tiempo
+      }
   }
 }
 
 
-//--------------------------------------------------- displayNumDia---------------------------------------------------------------
-void displayNumDia(uint16_t h, uint32_t col) // ARGUMENTOS: Número a mostrar, color para Wheel().
+//--------------------------------------------------- displayNumDiasSinAcc---------------------------------------------------------------
+void displayNumDiasSinAcc(uint16_t h, uint32_t col) // ARGUMENTOS: Número a mostrar, color para Wheel().
 {
   uint16_t firstDigit = h / 1000;
   uint16_t secondDigit = (h % 1000)/100;
@@ -176,11 +190,11 @@ void displayNumDia(uint16_t h, uint32_t col) // ARGUMENTOS: Número a mostrar, c
     }
     j=j+3;
   }
-   strip.show();
+   //strip.show();
 }
 
-//--------------------------------------------------- displayNumMesAnio----------------------------------------------------
-void displayNumMesAnio(uint16_t h, uint32_t col)
+//--------------------------------------------------- displayNumMes----------------------------------------------------
+void displayNumMes(uint16_t h, uint32_t col)
 {
   uint16_t firstDigit = h / 1000;
   uint16_t secondDigit = (h % 1000)/100;
@@ -253,17 +267,92 @@ void displayNumMesAnio(uint16_t h, uint32_t col)
     }
     j=j+2;
   }
-   strip.show();
+   //strip.show();
+}
+void displayNumAnio(uint16_t h, uint32_t col)
+{
+  uint16_t firstDigit = h / 1000;
+  uint16_t secondDigit = (h % 1000)/100;
+  uint16_t thirdDigit = ((h%1000)%100)/ 10;
+  uint16_t fourthDigit = ((h%1000)%100)%10;
+  int j = 0;
+  int i = 0;
+
+  //---------------------------------------- firstDigit
+  for ( i = 0; i < 7; i++)
+  {
+    if ((numbers[firstDigit] & (1 << 7 - i)) && (firstDigit > 0))
+    {
+      strip.setPixelColor(j + (14 * 3), Wheel(col));
+      strip.setPixelColor(j+1 + (14 * 3), Wheel(col));
+    }
+    else
+    {
+      strip.setPixelColor(j + (14 * 3 ), 0,0,0,0);
+      strip.setPixelColor(j+1 + (14 * 3 + 2), 0,0,0,0);
+    }
+    j=j+2;
+  }
+
+  // ---------------------------------------- secondDigit
+  j=0;
+  for (i = 0; i < 7; i++)
+  {
+    if ((numbers[secondDigit] & (1 << 7 - i)) && ((secondDigit >= 1) || (firstDigit > 0)))
+    {
+      strip.setPixelColor(j + (14*2),Wheel(col));
+      strip.setPixelColor(j+1 + (14*2),Wheel(col));
+    }
+    else
+    {
+      strip.setPixelColor(j + (14*2), 0,0,0,0);
+      strip.setPixelColor(j+1 + (14*2), 0,0,0,0);
+    }
+    j=j+2;
+  }
+   //-------------------------------------------- thirdDigit
+   j=0;
+  for (i = 0; i < 7; i++)
+  {
+    if ((numbers[thirdDigit] & (1 << 7 - i)) && ((thirdDigit >= 1) || (secondDigit > 0) || (firstDigit > 0)))
+    {
+      strip.setPixelColor(j + 14, Wheel(col));
+      strip.setPixelColor(j+1 + 14,Wheel(col));
+    }
+    else
+    {
+      strip.setPixelColor(j + 14, 0,0,0,0);
+      strip.setPixelColor(j+1 + 14, 0,0,0,0);
+    }
+    j=j+2;
+  }
+   // -------------------------------------------- fourthDigit
+   j=0;
+  for (i = 0; i < 7; i++)
+  {
+    if (numbers[fourthDigit] & (1 << 7 - i))
+    {
+      strip.setPixelColor(j ,Wheel(col));
+      strip.setPixelColor(j+1 , Wheel(col));
+    }
+    else
+    {
+      strip.setPixelColor(j , 0,0,0,0);
+      strip.setPixelColor(j+1 , 0,0,0,0);
+    }
+    j=j+2;
+  }
+   //strip.show();
 }
 //--------------------------------------------------- displayNumFecha--------------------------------------------------------------
-void displayNumFecha(uint16_t h, uint32_t col)
+void displayAccidente(uint16_t h, uint32_t col)
 {
    uint16_t i;
    for( i =  0; i < strip.numPixels(); i++) //
    {
      strip.setPixelColor(i,0,0,0,0);
-   }  strip.show();
-   strip.show();
+   }
+   //strip.show();
 }
 //---------------------------------------------------------------------- apagaPixels
 void apagaPixels()
@@ -282,7 +371,7 @@ uint32_t Wheel(byte WheelPos)
   { //Para el color blanco
     return strip.Color(0, 0, 0, 255);
   }
-
+else {
   WheelPos = 255 - WheelPos;
   if (WheelPos < 85 && WheelPos >0 )
   {
@@ -298,4 +387,5 @@ uint32_t Wheel(byte WheelPos)
     WheelPos -= 170;
     return strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
   }
+ }
 }
