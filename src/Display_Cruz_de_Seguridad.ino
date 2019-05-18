@@ -269,6 +269,7 @@ void displayNumMes(uint16_t h, uint32_t col)
   }
    //strip.show();
 }
+//--------------------------------------------------- displayNumAnio----------------------------------------------------
 void displayNumAnio(uint16_t h, uint32_t col)
 {
   uint16_t firstDigit = h / 1000;
