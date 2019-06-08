@@ -9,14 +9,14 @@
 #define PIN2 A2
 #define PIN3 A1
 #define PIN4 A0
-#define NUM_PIXELS 56
+#define NUM_PIXELS 84
 
 
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_PIXELS, PIN, NEO_GRBW + NEO_KHZ800);
-Adafruit_NeoPixel strip1 = Adafruit_NeoPixel(NUM_PIXELS, PIN1, NEO_GRBW + NEO_KHZ800);
-Adafruit_NeoPixel strip2 = Adafruit_NeoPixel(NUM_PIXELS, PIN2, NEO_GRBW + NEO_KHZ800);
-Adafruit_NeoPixel strip3 = Adafruit_NeoPixel(NUM_PIXELS, PIN3, NEO_GRBW + NEO_KHZ800);
-Adafruit_NeoPixel strip4 = Adafruit_NeoPixel(NUM_PIXELS, PIN4, NEO_GRBW + NEO_KHZ800);
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_PIXELS, PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip1 = Adafruit_NeoPixel(NUM_PIXELS, PIN1, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip2 = Adafruit_NeoPixel(NUM_PIXELS, PIN2, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip3 = Adafruit_NeoPixel(NUM_PIXELS, PIN3, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip4 = Adafruit_NeoPixel(NUM_PIXELS, PIN4, NEO_GRB + NEO_KHZ800);
 
 
 int tecla;
@@ -164,7 +164,8 @@ void displayNum(uint16_t h, uint32_t col, int brightness) // ARGUMENTOS: Número
   uint16_t secondDigit = (h % 1000)/100;
   uint16_t thirdDigit = ((h%1000)%100)/ 10;
   uint16_t fourthDigit = ((h%1000)%100)%10;
-  int j=0; //Para la posicion del neopixel.
+  //int j = numPixAnio + numPixMes + numPixFechas; //Para la posicion del neopixel.
+  int j = 0;
   int i = 0;
 
   //---------------------------------------- firstDigit
@@ -172,19 +173,17 @@ void displayNum(uint16_t h, uint32_t col, int brightness) // ARGUMENTOS: Número
   {
     if ((numbers[firstDigit] & (1 << 7 - i)) && (firstDigit > 0)) // Que sea diferente de cero
     { //Revisa el byte específico del vector y decide si debe encenderlo de algún color o apagarlo
-      strip.setPixelColor(j + (14 * 3), Wheel(col,brightness)); //Le asigna el color o...
-
-      strip.setPixelColor(j+1 + (14 * 3), Wheel(col,brightness));
-
+      strip.setPixelColor(j + (21 * 3), Wheel(col)); //Le asigna el color o...
+      strip.setPixelColor(j+1 + (21 * 3), Wheel(col));
+      strip.setPixelColor(j+2 + (21 * 3), Wheel(col));
     }
     else
     {
-      strip.setPixelColor(j + (14 * 3 ), 0,0,0,0); //...lo apaga
-
-      strip.setPixelColor(j+1 + (14 * 3 + 2), 0,0,0,0);
-
+      strip.setPixelColor(j + (21 * 3 ), 0,0,0,0); //...lo apaga
+      strip.setPixelColor(j+1 + (21 * 3 + 2), 0,0,0,0);
+      strip.setPixelColor(j+2 + (21 * 3 + 2), 0,0,0,0);
     }
-    j=j+2; //Posicion del Neopixel
+    j=j+3; //Posicion del Neopixel
   }
 
   // ---------------------------------------- secondDigit
@@ -193,15 +192,17 @@ void displayNum(uint16_t h, uint32_t col, int brightness) // ARGUMENTOS: Número
   {
     if ((numbers[secondDigit] & (1 << 7 - i)) && ((secondDigit >= 1) || (firstDigit > 0))) //el cero no se muestra
     {
-      strip.setPixelColor(j + (14*2),Wheel(col,brightness));
-      strip.setPixelColor(j+1 + (14*2),Wheel(col,brightness));
+      strip.setPixelColor(j + (21*2),Wheel(col));
+      strip.setPixelColor(j+1 + (21*2),Wheel(col));
+      strip.setPixelColor(j+2 + (21*2),Wheel(col));
     }
     else
     {
-      strip.setPixelColor(j + (14*2), 0,0,0,0);
-      strip.setPixelColor(j+1 + (14*2), 0,0,0,0);
+      strip.setPixelColor(j + (21*2), 0,0,0,0);
+      strip.setPixelColor(j+1 + (21*2), 0,0,0,0);
+      strip.setPixelColor(j+2 + (21*2), 0,0,0,0);
     }
-    j=j+2;
+    j=j+3;
   }
    //-------------------------------------------- thirdDigit
    j=0;
@@ -209,18 +210,17 @@ void displayNum(uint16_t h, uint32_t col, int brightness) // ARGUMENTOS: Número
   {
     if ((numbers[thirdDigit] & (1 << 7 - i)) && ((thirdDigit >= 1) || (secondDigit > 0) || (firstDigit > 0))) //el cero no se muestra
     {
-      strip.setPixelColor(j + 14, Wheel(col,brightness));
-      strip.setPixelColor(j+1 + 14,Wheel(col,brightness));
-
+      strip.setPixelColor(j + 21, Wheel(col));
+      strip.setPixelColor(j+1 + 21,Wheel(col));
+      strip.setPixelColor(j+2 + 21,Wheel(col));
     }
     else
     {
-      strip.setPixelColor(j + 14, 0,0,0,0);
-
-      strip.setPixelColor(j+1 + 14, 0,0,0,0);
-
+      strip.setPixelColor(j + 21, 0,0,0,0);
+      strip.setPixelColor(j+1 + 21, 0,0,0,0);
+      strip.setPixelColor(j+2 + 21, 0,0,0,0);
     }
-    j=j+2;
+    j=j+3;
   }
    // -------------------------------------------- fourthDigit
    j=0;
@@ -228,21 +228,20 @@ void displayNum(uint16_t h, uint32_t col, int brightness) // ARGUMENTOS: Número
   {
     if (numbers[fourthDigit] & (1 << 7 - i))
     {
-      strip.setPixelColor(j ,Wheel(col,brightness));
-
-      strip.setPixelColor(j+1 , Wheel(col,brightness));
-
+      strip.setPixelColor(j ,Wheel(col));
+      strip.setPixelColor(j+1 , Wheel(col));
+      strip.setPixelColor(j+2 , Wheel(col));
     }
     else
     {
       strip.setPixelColor(j , 0,0,0,0);
-
       strip.setPixelColor(j+1 , 0,0,0,0);
-
+      strip.setPixelColor(j+2 , 0,0,0,0);
     }
-    j=j+2;
+    j=j+3;
   }
    strip.show();
+
 }
 
 //---------------------------------------------------------------------- apagaPixels
@@ -256,8 +255,9 @@ void apagaPixels()
 }
 
 //---------------------------------- Input a value 0 to 255 to get a color value r - g - b - back to r + a number (0-255) for brightness!!
-uint32_t Wheel(byte WheelPos, int bright)
+uint32_t Wheel(byte WheelPos)
 {
+  int bright=100;
   if (WheelPos == 0)
   { //Para el color blanco
     return strip.Color(0, 0, 0, 255);
