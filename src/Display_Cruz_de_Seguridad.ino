@@ -33,7 +33,6 @@ int nfecha, color, ndiaact;
 
 
 
-
 byte numbers[] = {
   B11101110,    // 0
   B10001000,    // 1
